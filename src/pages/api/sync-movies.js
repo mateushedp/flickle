@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { formatMovies } from "@/lib/format-movies";
 import axios from "axios";
 
-const prisma = new PrismaClient();
 const myBearer = process.env.NEXT_PUBLIC_TMDB_BEARER;
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const getMovies = async (totalMovies) => {
 	let collectedMovies = [];
@@ -36,6 +36,20 @@ const getMovies = async (totalMovies) => {
 	}
 };
 
+const getDetailedMovies = async (movies) => {
+	const results = [];
+
+	for (let i = 0; i < movies.length; i++) {
+		const details = await getMovieDetails(movies[i]);
+		results.push(details);
+
+		// Sleep 300ms between requests to stay under 4/sec
+		await sleep(300); 
+	}
+
+	return results;
+};
+
 const getMovieDetails = async (movie) => {
 		
 	const movieDetails = await axios({
@@ -56,13 +70,11 @@ export default async function handler(req, res) {
 	}
 
 	try {
-		const totalMovies = 200;
-		// console.time();
+		const totalMovies = 500;
+
 		const movieList = await getMovies(totalMovies);
-		// console.timeEnd();
-		const detailedMovies = await Promise.all(
-			movieList.map(movie => getMovieDetails(movie))
-		  );
+
+		const detailedMovies = await getDetailedMovies(movieList);
 
 		const formattedMovies =  formatMovies(detailedMovies);
 
@@ -71,6 +83,8 @@ export default async function handler(req, res) {
 		await prisma.movie.createMany({
 			data: formattedMovies,
 		});
+
+		await axios.post("http://localhost:3000/api/pick-and-save-daily-movie");	
 
 		return res.status(200).json({ success: true });
 	} catch (error) {
