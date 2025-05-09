@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import {
 	Dialog,
@@ -6,12 +7,41 @@ import {
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
 import Image from "next/image";
-import axios from "axios";
+import prisma from "@/lib/prisma";
 
-function Home() {
 
-	const [movies, setMovies] = useState([]);
-	const [movieOfTheDay, setMovieOfTheDay] = useState();
+export async function getServerSideProps() {
+	const movies = await prisma.movie.findMany();
+
+	const cleanedMovies = movies.map(movie => {
+		const { createdAt, updatedAt, ...cleanedMovie } = movie;
+		return cleanedMovie;
+	});
+
+	const dailyMovie = await prisma.dailyMovie.findFirst({
+		orderBy: { date: "desc" },
+		include: {
+			movie: true,
+		},
+	});
+
+	// Clean up Date fields in dailyMovie
+	if (dailyMovie) {
+		delete dailyMovie.movie.createdAt;
+		delete dailyMovie.movie.updatedAt;
+		delete dailyMovie.date;
+	}
+
+	return {
+		props: {
+			movies: cleanedMovies,
+			movieOfTheDay: dailyMovie?.movie || null,
+		},
+	};
+}
+
+function Home({movies, movieOfTheDay}) {
+
 	const [selectedMovies, setSelectedMovies] = useState([]);
 	const [search, setSearch] = useState("");
 
@@ -20,85 +50,23 @@ function Home() {
 	const [showFailModal, setShowFailModal] = useState(false);
 	
 	const [tries, setTries] = useState(0);
-	const maxTries = 3;
-
-  
-	const myBearer = process.env.NEXT_PUBLIC_TMDB_BEARER;
-	const totalMovies = 100;
-
-	const getMovies = async () => {
-		let collectedMovies = [];
-		let page = 1;
-
-		try {
-			while (collectedMovies.length < totalMovies) {
-				const result = await axios({
-					method: "GET",
-					url: `https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${page}`,
-					headers: {
-						accept: "application/json",
-						Authorization: "Bearer " + myBearer
-					}
-				});
-
-				collectedMovies.push(...result.data.results);
-
-				if (result.data.results.length < 20) break;
-
-				page++;
-			}
-
-			setMovies(collectedMovies.slice(0, totalMovies));
-
-		} catch (error) {
-			console.error("Error fetching movies:", error);
-		}
-	};
-
-	const getRandomMovie = () => {
-		const randomIndex = Math.floor(Math.random() * movies.length);
-		return movies[randomIndex];
-	};
-
-	const getMovieDetails = async (movie) => {
-		
-		const movieDetails = await axios({
-			method: "GET",
-			url: `https://api.themoviedb.org/3/movie/${movie.id}?language=en-US`,
-			headers: {
-				accept: "application/json",
-				Authorization: "Bearer " + myBearer
-			}
-		});
-
-		console.log(movieDetails.data);
-		return movieDetails.data;
-	};
-
-	const getMovieOfTheDay = async () => {
-		const randomMovie = getRandomMovie();
-		const randomMovieDetails = await getMovieDetails(randomMovie);
-		//checar se existe filme etc.
-		
-		setMovieOfTheDay(randomMovieDetails);
-	};
+	const maxTries = 10;
 
 	const onSelectMovie = async (movie) => {
 		if (gameOver) return;
 	  
-		const movieDetails = await getMovieDetails(movie);
-		setSelectedMovies(prev => [movieDetails, ...prev]);
+		setSelectedMovies(prev => [movie, ...prev]);
 	  
-		const isCorrect = movieDetails.title === movieOfTheDay.title;
-	  
+		const isCorrect = movie.title === movieOfTheDay.title;
+
+	  	const newTries = tries + 1;
+		setTries(newTries);
+
 		if (isCorrect) {
 		  setGameOver(true);
 		  setShowSuccessModal(true);
 		  return;
 		}
-	  
-		const newTries = tries + 1;
-		setTries(newTries);
 	  
 		if (newTries >= maxTries) {
 		  setGameOver(true);
@@ -114,19 +82,6 @@ function Home() {
     			movie.title.toLowerCase().includes(search.toLowerCase())
     		)
     		.slice(0, 5);
-
-	useEffect(() => {
-		getMovies();
-		
-	}, []);
-
-	useEffect(() => {
-		if(movies.length > 0) getMovieOfTheDay();
-	}, [movies]);
-
-	useEffect(() => {
-		console.log(selectedMovies);
-	}, [selectedMovies]);
 
 	return (
 		<div className="max-w-full min-h-screen bg-white flex flex-col items-center">
@@ -146,7 +101,7 @@ function Home() {
 											/>
 										</div>
 										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
-											{movieOfTheDay.title} ({movieOfTheDay.release_date.substring(0, 4)})
+											{movieOfTheDay.title} ({movieOfTheDay.release_year})
 										</p>
 									</>
 						}
@@ -171,7 +126,7 @@ function Home() {
 											/>
 										</div>
 										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
-											{movieOfTheDay.title} ({movieOfTheDay.release_date.substring(0, 4)})
+											{movieOfTheDay.title} ({movieOfTheDay.release_year})
 										</p>
 									</>
 						}
@@ -209,10 +164,6 @@ function Home() {
 				<div className=" w-full my-[32px]">
 					<div>
 						<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
-						
-						{/* {movieOfTheDay && 
-								<MovieCard selectedMovie={movieOfTheDay}/>
-						}	 */}
 							
 						{selectedMovies.length > 0 && selectedMovies.map(movie => {
 							return <MovieCard key={movie.id} selectedMovie={movie} movieOfTheDay={movieOfTheDay}/>;
