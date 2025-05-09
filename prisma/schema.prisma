@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Movie {
+  id           Int         @id @map("_id")
+  title        String
+  poster_path  String
+  genre        String
+  release_year Int
+  country      String
+  runtime      Int
+  score        Float
+  budget       Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  dailyMovies  DailyMovie[] @relation("MovieDailyMovies")
+}
+
+model DailyMovie {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId 
+  movieId  Int
+  movie    Movie    @relation("MovieDailyMovies", fields: [movieId], references: [id]) 
+  date     DateTime 
+}
