@@ -53,7 +53,7 @@ function Home({movies, movieOfTheDay}) {
 	const maxTries = 10;
 
 	const onSelectMovie = async (movie) => {
-		if (gameOver) return;
+		if (gameOver || (selectedMovies.find(selectedMovie => selectedMovie.title === movie.title))) return;
 	  
 		setSelectedMovies(prev => [movie, ...prev]);
 	  
