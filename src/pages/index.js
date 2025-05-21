@@ -43,36 +43,57 @@ export async function getServerSideProps() {
 function Home({movies, movieOfTheDay}) {
 
 	const [selectedMovies, setSelectedMovies] = useState([]);
+	const [tries, setTries] = useState(0);
+
 	const [search, setSearch] = useState("");
 
 	const [gameOver, setGameOver] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showFailModal, setShowFailModal] = useState(false);
 	
-	const [tries, setTries] = useState(0);
 	const maxTries = 10;
 
-	const onSelectMovie = async (movie) => {
-		if (gameOver || (selectedMovies.find(selectedMovie => selectedMovie.title === movie.title))) return;
-	  
-		setSelectedMovies(prev => [movie, ...prev]);
-	  
+	const onSelectMovie = (movie) => {
+		if (gameOver || selectedMovies.find((m) => m.title === movie.title)) return;
+
+		const updatedMovies = [movie, ...selectedMovies];
+		setSelectedMovies(updatedMovies);
+
+		const updatedTries = tries + 1;
+		setTries(updatedTries);
+
 		const isCorrect = movie.title === movieOfTheDay.title;
 
-	  	const newTries = tries + 1;
-		setTries(newTries);
-
 		if (isCorrect) {
-		  setGameOver(true);
-		  setShowSuccessModal(true);
-		  return;
+			setGameOver(true);
+			setShowSuccessModal(true);
+			return;
 		}
-	  
-		if (newTries >= maxTries) {
-		  setGameOver(true);
-		  setShowFailModal(true);
+
+		if (updatedTries >= maxTries) {
+			setGameOver(true);
+			setShowFailModal(true);
 		}
-	  };
+	};
+
+	useEffect(() => {
+		const savedMovies = localStorage.getItem("savedMovies");
+		const savedTries = localStorage.getItem("savedTries");
+		if(savedTries >= 10) setGameOver(true);
+
+		if (savedMovies) setSelectedMovies(JSON.parse(savedMovies));
+		if (savedTries) setTries(JSON.parse(savedTries));
+	}, []);
+
+	useEffect(() => {
+		localStorage.setItem("savedMovies", JSON.stringify(selectedMovies));
+		// const savedMovies = JSON.parse(localStorage.getItem("savedMovies"));
+	}, [selectedMovies]);
+
+	useEffect(() => {
+		localStorage.setItem("savedTries", JSON.stringify(tries));
+		// const savedTries = JSON.parse(localStorage.getItem("savedTries"));
+	}, [tries]);
 
 	const filteredMovies =
     search.trim() === ""
@@ -162,8 +183,8 @@ function Home({movies, movieOfTheDay}) {
 
 				{/* body */}
 				<div className=" w-full my-[32px]">
-					<div>
-						<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
+					<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
+					<div className="flex flex-col gap-4">
 							
 						{selectedMovies.length > 0 && selectedMovies.map(movie => {
 							return <MovieCard key={movie.id} selectedMovie={movie} movieOfTheDay={movieOfTheDay}/>;
