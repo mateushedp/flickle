@@ -3,43 +3,63 @@ import Image from "next/image";
 
 function MovieCard({selectedMovie, movieOfTheDay}) {
 
-	const getReleaseDateVariant = (selectedMovieDate, movieOfTheDayDate) => {
-		if(selectedMovieDate === movieOfTheDayDate) return "success";
-		//checks if they are on the same decade
-		if(Math.floor(new Date(selectedMovieDate).getFullYear() / 10) === Math.floor(new Date(movieOfTheDayDate).getFullYear() / 10)){
-			return "close";
-		}
+	const getReleaseDateVariant = (selected, actual) => {
+		if (selected === actual) return { variant: "success" };
+		if (Math.abs(selected - actual) < 10)
+			return { variant: "close", direction: selected > actual ? "down" : "up" };
+		return { variant: "", direction: selected > actual ? "down" : "up" };
 	};
 
-	const getVoteAvgVariant = (selectedMovieAvg, movieOfTheDayAvg) => {
-		if(selectedMovieAvg === movieOfTheDayAvg) return "success";
-		if(Math.floor(selectedMovieAvg) === Math.floor(movieOfTheDayAvg)) return "close";
+	const getVoteAvgVariant = (selected, actual) => {
+		if (selected === actual) return { variant: "success" };
+		if (Math.floor(selected) === Math.floor(actual))
+			return { variant: "close", direction: selected > actual ? "down" : "up" };
+		return { variant: "", direction: selected > actual ? "down" : "up" };
 	};
 
-	const getRuntimeVariant = (selectedMovieRuntime, movieOfTheDayRuntime) => {
-		if(selectedMovieRuntime === movieOfTheDayRuntime) return "success";
-		if(Math.abs(selectedMovieRuntime - movieOfTheDayRuntime) < 10) return "close";
 
+	const getRuntimeVariant = (selected, actual) => {
+		if (selected === actual) return { variant: "success" };
+		if (Math.abs(selected - actual) < 10)
+			return { variant: "close", direction: selected > actual ? "down" : "up" };
+		return { variant: "", direction: selected > actual ? "down" : "up" };
 	};
 
-	const getBudgetVariant = (selectedMovieBudget, movieOfTheDayBudget) => {
-		if(selectedMovieBudget === movieOfTheDayBudget) return "success";
-		const diff = Math.abs(selectedMovieBudget - movieOfTheDayBudget);
-		const avg = (selectedMovieBudget + movieOfTheDayBudget) / 2;
-
+	const getBudgetVariant = (selected, actual) => {
+		if (selected === actual) return { variant: "success" };
+		const diff = Math.abs(selected - actual);
+		const avg = (selected + actual) / 2;
 		const percentageDiff = diff / avg;
 
-		if (percentageDiff < 0.25) return "close";   // within 25%
+		if (percentageDiff < 0.25)
+			return { variant: "close", direction: selected > actual ? "down" : "up" };
+		return { variant: "", direction: selected > actual ? "down" : "up" };
 	};
+
 
 	const compareMovies = (selectedMovie, movieOfTheDay, movieObject) => {
 
 		movieObject.country.variant = selectedMovie.country === movieOfTheDay.country ? "success" : "";
 		movieObject.genre.variant = selectedMovie.genre === movieOfTheDay.genre ? "success" : "";
-		movieObject.release_year.variant = getReleaseDateVariant(selectedMovie.release_year, movieOfTheDay.release_year);
-		movieObject.budget.variant = getBudgetVariant(selectedMovie.budget, movieOfTheDay.budget);
-		movieObject.score.variant = getVoteAvgVariant(selectedMovie.score, movieOfTheDay.score);
-		movieObject.runtime.variant = getRuntimeVariant(selectedMovie.runtime, movieOfTheDay.runtime);
+		movieObject.release_year = {
+			...movieObject.release_year,
+			...getReleaseDateVariant(selectedMovie.release_year, movieOfTheDay.release_year),
+		};
+
+		movieObject.budget = {
+			...movieObject.budget,
+			...getBudgetVariant(selectedMovie.budget, movieOfTheDay.budget),
+		};
+
+		movieObject.score = {
+			...movieObject.score,
+			...getVoteAvgVariant(selectedMovie.score, movieOfTheDay.score),
+		};
+
+		movieObject.runtime = {
+			...movieObject.runtime,
+			...getRuntimeVariant(selectedMovie.runtime, movieOfTheDay.runtime),
+		};
 
 	};
 
@@ -77,13 +97,15 @@ function MovieCard({selectedMovie, movieOfTheDay}) {
 
 			<div className="h-full w-[218px] flex flex-col gap-[5px]">
 				<div className="flex gap-[5px] w-full h-1/2">
-					<MovieCardBubble label={"Genre"} value={movieObject.genre.value} variant={movieObject.genre.variant}/>
-					<MovieCardBubble label={"Runtime"} value={movieObject.runtime.value} variant={movieObject.runtime.variant}/>
+					<MovieCardBubble label="Genre" data={movieObject.genre} />
+					<MovieCardBubble label="Runtime" data={movieObject.runtime} />
+
+	
 				</div>
 				<div className="flex gap-[5px] w-full h-1/2">
-					<MovieCardBubble label={"Country"} value={movieObject.country.value} variant={movieObject.country.variant}/>
-				 	<MovieCardBubble label={"Date"} value={movieObject.release_year.value} variant={movieObject.release_year.variant}/>
-					<MovieCardBubble label={"Score"} value={movieObject.score.value} variant={movieObject.score.variant}/>
+					<MovieCardBubble label={"Country"} data={movieObject.country}/>
+				 	<MovieCardBubble label={"Date"} data={movieObject.release_year}/>
+					<MovieCardBubble label={"Score"} data={movieObject.score}/>
 				</div>
 			</div>
 		</div>
