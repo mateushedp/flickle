@@ -47,42 +47,46 @@ function Home({movies, movieOfTheDay}) {
 
 	const [search, setSearch] = useState("");
 
-	const [gameOver, setGameOver] = useState(false);
+	const [hasWon, setHasWon] = useState(false);
+	const [hasLost, setHasLost] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showFailModal, setShowFailModal] = useState(false);
 	
 	const maxTries = 10;
 
-	const onSelectMovie = (movie) => {
-		if (gameOver || selectedMovies.find((m) => m.title === movie.title)) return;
+	const checkGameStatus = (movies, tries) => {
+		const hasWon = movies.some((movie) => movie.title === movieOfTheDay.title);
+		const hasLost = tries >= maxTries && !hasWon;
 
-		const updatedMovies = [movie, ...selectedMovies];
-		setSelectedMovies(updatedMovies);
-
-		const updatedTries = tries + 1;
-		setTries(updatedTries);
-
-		const isCorrect = movie.title === movieOfTheDay.title;
-
-		if (isCorrect) {
-			setGameOver(true);
+		if (hasWon) {
+			setHasWon(true);
 			setShowSuccessModal(true);
-			return;
-		}
-
-		if (updatedTries >= maxTries) {
-			setGameOver(true);
+		} else if (hasLost) {
+			setHasLost(true);
 			setShowFailModal(true);
 		}
 	};
 
-	useEffect(() => {
-		const savedMovies = localStorage.getItem("savedMovies");
-		const savedTries = localStorage.getItem("savedTries");
-		if(savedTries >= 10) setGameOver(true);
+	const onSelectMovie = (movie) => {
+		if (hasWon || hasLost || selectedMovies.find((m) => m.title === movie.title)) return;
 
-		if (savedMovies) setSelectedMovies(JSON.parse(savedMovies));
-		if (savedTries) setTries(JSON.parse(savedTries));
+		const updatedMovies = [movie, ...selectedMovies];
+		const updatedTries = tries + 1;
+		
+		setSelectedMovies(updatedMovies);
+		setTries(updatedTries);
+
+		checkGameStatus(updatedMovies, updatedTries);
+	};
+
+	useEffect(() => {
+		const savedMovies = JSON.parse(localStorage.getItem("savedMovies"));
+		const savedTries = JSON.parse(localStorage.getItem("savedTries"));
+		
+		checkGameStatus(savedMovies, savedTries);
+
+		if (savedMovies) setSelectedMovies(savedMovies);
+		if (savedTries) setTries(savedTries);
 	}, []);
 
 	useEffect(() => {
@@ -176,7 +180,7 @@ function Home({movies, movieOfTheDay}) {
 							setSearch={setSearch}
 							filteredMovies={filteredMovies}
 							onSelectMovie={onSelectMovie}
-							disabled={gameOver}
+							disabled={hasWon || hasLost}
 						/>
 					</div>
 				</div>
@@ -190,6 +194,9 @@ function Home({movies, movieOfTheDay}) {
 					<div className="flex flex-col gap-4">
 						
 							
+						{hasLost && 
+						<MovieCard key={movieOfTheDay.id} selectedMovie={movieOfTheDay} movieOfTheDay={movieOfTheDay}/>
+						}
 						{selectedMovies.length > 0 && selectedMovies.map(movie => {
 							return <MovieCard key={movie.id} selectedMovie={movie} movieOfTheDay={movieOfTheDay}/>;
 						})
