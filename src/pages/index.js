@@ -55,7 +55,7 @@ function Home({movies, movieOfTheDay}) {
 	const maxTries = 10;
 
 	const checkGameStatus = (movies, tries) => {
-		const hasWon = movies.some((movie) => movie.title === movieOfTheDay.title);
+		const hasWon = movies ? movies.some((movie) => movie.title === movieOfTheDay.title) : false;
 		const hasLost = tries >= maxTries && !hasWon;
 
 		if (hasWon) {
