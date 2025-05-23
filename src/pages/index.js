@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/dialog";
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
+import { motion, AnimatePresence } from "framer-motion";
+import Confetti from "@/components/ui/confetti";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 
@@ -134,6 +136,9 @@ function Home({movies, movieOfTheDay}) {
 				</DialogContent>
 			</Dialog>
 			
+			{showSuccessModal &&
+				<Confetti />
+			}
 			
 			<Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal} >
 				<DialogContent className="w-[340px] text-white bg-green-main">
@@ -192,16 +197,24 @@ function Home({movies, movieOfTheDay}) {
 					}
 					<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
 					<div className="flex flex-col gap-4">
-						
-							
 						{hasLost && 
 						<MovieCard key={movieOfTheDay.id} selectedMovie={movieOfTheDay} movieOfTheDay={movieOfTheDay}/>
 						}
-						{selectedMovies.length > 0 && selectedMovies.map(movie => {
-							return <MovieCard key={movie.id} selectedMovie={movie} movieOfTheDay={movieOfTheDay}/>;
-						})
-			
-						}
+						<AnimatePresence initial={false}>
+
+							{selectedMovies.length > 0 &&
+								selectedMovies.map((movie) => (
+									<motion.div
+										key={movie.id}
+										initial={{ opacity: 0, y: -20 }}   // start slightly above
+										animate={{ opacity: 1, y: 0 }}     // animate to natural position
+										exit={{ opacity: 0, y: 20 }}       // animate out down (optional)
+										transition={{ duration: 0.6 }}
+									>
+										<MovieCard selectedMovie={movie} movieOfTheDay={movieOfTheDay} />
+									</motion.div>
+								))}
+						</AnimatePresence>
 					</div>
 				</div>
 			</div>

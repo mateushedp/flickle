@@ -1,11 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import { ChevronUp, ChevronDown } from "lucide-react"; // or your preferred icon set
+import { ChevronUp, ChevronDown } from "lucide-react";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { motion } from "framer-motion";
 
 function MovieCardBubble({ label, data }) {
 	const { value, variant, direction } = data || {};
@@ -32,7 +33,12 @@ function MovieCardBubble({ label, data }) {
 	const valueColor = variant === "success" ? "text-white" : "text-black";
 
 	return (
-		<div className={`h-full w-full rounded-sm ${baseColor} border border-black shadow-sm flex flex-col items-center px-1 text-center pt-[6px]`}>
+		<motion.div
+			initial={{ boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }}
+			animate={{ boxShadow: "2px 2px rgba(0, 0, 0, 0.75)" }} // Match your shadow-sm
+			transition={{ duration: 0.8 }}
+			className={`h-full w-full rounded-sm ${baseColor} border border-black flex flex-col items-center px-1 text-center pt-[6px]`}
+		>
 			<p className={`text-sm font-antonio uppercase ${labelColor}`}>{label}</p>
 			<div className="flex items-center gap-1 flex-1 justify-center">
 				{label === "Country" ? (
@@ -61,7 +67,7 @@ function MovieCardBubble({ label, data }) {
 					</>
 				)}
 			</div>
-		</div>
+		</motion.div>
 	);
 }
 
