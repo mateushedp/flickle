@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/ui/confetti";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
+import Poster from "@/components/ui/poster";
 
 
 export async function getServerSideProps() {
@@ -121,12 +122,7 @@ function Home({movies, movieOfTheDay}) {
 						{movieOfTheDay  &&
 									<>
 										<div className="brutalist-box mx-auto my-3.5 truncate max-w-[180px] h-[234px] relative overflow-hidden">
-											<Image 
-												src={`https://image.tmdb.org/t/p/original${movieOfTheDay.poster_path}`} 
-												alt="Movie poster"
-												className="background-cover"
-												fill
-											/>
+											<Poster movie={movieOfTheDay}/>
 										</div>
 										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
 											{movieOfTheDay.title} ({movieOfTheDay.release_year})
@@ -149,12 +145,7 @@ function Home({movies, movieOfTheDay}) {
 						{movieOfTheDay  &&
 									<>
 										<div className="brutalist-box mx-auto my-3.5 truncate max-w-[180px] h-[234px] relative overflow-hidden">
-											<Image 
-												src={`https://image.tmdb.org/t/p/original${movieOfTheDay.poster_path}`} 
-												alt="Movie poster"
-												className="background-cover"
-												fill
-											/>
+											<Poster movie={movieOfTheDay} />
 										</div>
 										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
 											{movieOfTheDay.title} ({movieOfTheDay.release_year})
