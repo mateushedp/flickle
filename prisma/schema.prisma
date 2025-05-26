@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Movie {
-  id           Int         @id @map("_id")
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   poster_path  String
   genre        String
@@ -25,7 +25,7 @@ model Movie {
 
 model DailyMovie {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId 
-  movieId  Int?
+  movieId  String?   @db.ObjectId
   movie    Movie?    @relation("MovieDailyMovies", fields: [movieId], references: [id]) 
   date     DateTime 
 }
