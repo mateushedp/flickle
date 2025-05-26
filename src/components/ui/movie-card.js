@@ -1,7 +1,10 @@
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import MovieCardBubble from "./movie-card-bubble";
 import Image from "next/image";
 
 function MovieCard({selectedMovie, movieOfTheDay}) {
+	const [isLoading, setIsLoading] = useState(true);
 
 	const getReleaseDateVariant = (selected, actual) => {
 		if (selected === actual) return { variant: "success" };
@@ -83,12 +86,22 @@ function MovieCard({selectedMovie, movieOfTheDay}) {
 			
 			<div className="brutalist-box h-full w-[101px] relative overflow-hidden">
 				{selectedMovie && selectedMovie.poster_path &&
-				<Image 
-					src={`https://image.tmdb.org/t/p/original${selectedMovie.poster_path}`} 
-					alt=""
-					fill
-					className="background-cover"
-				/>
+				<div className="relative w-full h-full">
+					{isLoading && 
+					<div className="absolute inset-0 bg-neutral-300 animate-shimmer " />}
+
+					<Image 
+						src={`https://image.tmdb.org/t/p/w780${selectedMovie.poster_path}`} 
+						alt={selectedMovie.title || "Movie poster"}
+						fill
+						className={cn(
+							"background-cover object-cover transition-opacity duration-500",
+							isLoading ? "opacity-0" : "opacity-100"
+						)}
+						onLoadingComplete={() => setIsLoading(false)}
+					/>
+				</div>
+				 
 				}
 				<div className="w-full min-h-[30px] max-h-[60px] absolute bottom-0 border bg-white flex items-center justify-center">
 					<p className="font-bold text-[12px] text-center line-clamp-3">{selectedMovie.title}</p>
