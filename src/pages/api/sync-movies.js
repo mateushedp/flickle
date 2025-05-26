@@ -70,7 +70,7 @@ export default async function handler(req, res) {
 	}
 
 	try {
-		const totalMovies = 500;
+		const totalMovies = 1000;
 
 		const movieList = await getMovies(totalMovies);
 
