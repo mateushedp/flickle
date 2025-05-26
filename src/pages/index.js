@@ -184,9 +184,9 @@ function Home({movies, movieOfTheDay}) {
 
 				{/* body */}
 				<div className=" w-full my-[32px]">
-					{movieOfTheDay && 
+					{/* {movieOfTheDay && 
 						<MovieCard key={movieOfTheDay.id} selectedMovie={movieOfTheDay} movieOfTheDay={movieOfTheDay}/>
-					}
+					} */}
 					<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
 					<div className="flex flex-col gap-4">
 						{hasLost && 
