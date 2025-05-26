@@ -9,23 +9,33 @@ const compat = new FlatCompat({
 	baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.config({
-	extends: ["next/core-web-vitals", "prettier"],
-	rules: {
-		"indent": [
-			"error",
-			"tab"
+const eslintConfig = [
+	{
+		ignores: [
+			"src/generated/prisma/**/*",
+			// "prisma/generated/*",
+			"node_modules/.prisma/*",
+			// Add any other folders you want ESLint to skip
 		],
-		"linebreak-style": [
-			"error",
-			"unix"
-		],
-		semi: ["error"],
-		quotes: ["error", "double"],
-		"prefer-arrow-callback": ["error"],
-		"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-		"no-undef": "error",
-	}
-})];
+	},
+	...compat.config({
+		extends: ["next/core-web-vitals", "prettier"],
+		rules: {
+			"indent": [
+				"error",
+				"tab"
+			],
+			"linebreak-style": [
+				"error",
+				"unix"
+			],
+			semi: ["error"],
+			quotes: ["error", "double"],
+			"prefer-arrow-callback": ["error"],
+			"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+			"no-undef": "error",
+		
+		}
+	})];
 
 export default eslintConfig;

@@ -89,6 +89,7 @@ function Home({movies, movieOfTheDay}) {
 
 		if (savedMovies) setSelectedMovies(savedMovies);
 		if (savedTries) setTries(savedTries);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
