@@ -1,6 +1,6 @@
 {
   "crons": [{
       "path": "/api/pick-and-save-daily-movie",
-      "schedule": "5 14 * * *"
+      "schedule": "8 14 * * *"
     }]
 }
