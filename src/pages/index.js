@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
+import { isSameDay, parseISO, format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/ui/confetti";
 import Image from "next/image";
@@ -70,6 +71,13 @@ function Home({movies, movieOfTheDay}) {
 		}
 	};
 
+	const saveGame = (movies, tries) => {
+		const today = format(new Date(), "yyyy-MM-dd");
+		localStorage.setItem("savedMovies", JSON.stringify(movies));
+		localStorage.setItem("savedTries", JSON.stringify(tries));
+		localStorage.setItem("savedDate", today);
+	};
+
 	const onSelectMovie = (movie) => {
 		if (hasWon || hasLost || selectedMovies.find((m) => m.title === movie.title)) return;
 
@@ -78,30 +86,37 @@ function Home({movies, movieOfTheDay}) {
 		
 		setSelectedMovies(updatedMovies);
 		setTries(updatedTries);
+		saveGame(updatedMovies, updatedTries);
 
 		checkGameStatus(updatedMovies, updatedTries);
 	};
 
 	useEffect(() => {
+		const savedDateStr = localStorage.getItem("savedDate");
+		const today = new Date();
+
 		const savedMovies = JSON.parse(localStorage.getItem("savedMovies"));
 		const savedTries = JSON.parse(localStorage.getItem("savedTries"));
-		
-		checkGameStatus(savedMovies, savedTries);
 
-		if (savedMovies) setSelectedMovies(savedMovies);
-		if (savedTries) setTries(savedTries);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		const isValid = savedDateStr && isSameDay(parseISO(savedDateStr), today);
+
+		if (isValid) {
+			checkGameStatus(savedMovies, savedTries);
+
+			if (savedMovies) setSelectedMovies(savedMovies);
+			if (savedTries) setTries(savedTries);
+		} else {
+			// Clear outdated data
+			localStorage.removeItem("savedMovies");
+			localStorage.removeItem("savedTries");
+			localStorage.removeItem("savedDate");
+
+			// Optional: reset states if needed
+			setSelectedMovies([]);
+			setTries(0);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	useEffect(() => {
-		localStorage.setItem("savedMovies", JSON.stringify(selectedMovies));
-		// const savedMovies = JSON.parse(localStorage.getItem("savedMovies"));
-	}, [selectedMovies]);
-
-	useEffect(() => {
-		localStorage.setItem("savedTries", JSON.stringify(tries));
-		// const savedTries = JSON.parse(localStorage.getItem("savedTries"));
-	}, [tries]);
 
 	const filteredMovies =
     search.trim() === ""
