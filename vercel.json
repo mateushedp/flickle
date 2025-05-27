@@ -1,0 +1,7 @@
+{
+  "crons": [{
+      "path": "/api/pick-and-save-daily-movie",
+      "schedule": "0 14 * * *",
+      "timezone": "America/Sao_Paulo"
+    }]
+}
