@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "cron": [
+    {
+      "path": "/api/pick-and-save-daily-movie",
+      "schedule": "0 14 * * *",
+      "timezone": "America/Sao_Paulo"
+    }
+  ]
+}
