@@ -65,6 +65,14 @@ const getMovieDetails = async (movie) => {
 };
 
 export default async function handler(req, res) {
+
+	const secret = process.env.CRON_SECRET;
+	const token = req.query.secret;
+
+	if (secret !== token) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+
 	if (req.method !== "GET") {
 		return res.status(405).json({ error: "Method not allowed" });
 	}
