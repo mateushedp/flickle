@@ -1,6 +1,6 @@
 {
   "crons": [{
-      "path": "/api/pick-and-save-daily-movie",
+      "path": "/api/pick-and-save-daily-movie?secret=a5cB423SD1GLWksfn7887SD13bMLAS3",
       "schedule": "0 3 * * *"
     }]
 }
