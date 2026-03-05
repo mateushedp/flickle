@@ -1,13 +1,13 @@
-import { Input } from "./input";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+import { Movie } from "@/types";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { Search } from "lucide-react";
-import { useState } from "react";
-import { Movie } from "@/types";
-import type { ChangeEvent } from "react";
+import { Input } from "./input";
 import MovieSuggestionList from "./movie-suggestion-list";
 
 interface SearchBoxProps {
