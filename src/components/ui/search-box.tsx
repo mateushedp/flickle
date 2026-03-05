@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { Movie } from "@/types";
 import type { ChangeEvent } from "react";
+import MovieSuggestionList from "./movie-suggestion-list";
 
 interface SearchBoxProps {
 	search: string;
@@ -22,16 +23,18 @@ function SearchBox({ search, setSearch, filteredMovies, onSelectMovie, disabled 
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearch(e.target.value);
-		setOpenSuggestions(!!(e.target.value.trim() !== ""));
+		setOpenSuggestions(e.target.value.trim() !== "");
+	};
+
+	const handleSelectMovie = async (movie: Movie) => {
+		await onSelectMovie(movie);
+		setOpenSuggestions(false);
+		setSearch("");
 	};
 
 	return (
 		<div className="w-full h-[50px]" >
 			<div className="relative w-full h-full max-w-sm" >
-				{/* <div className="w-full h-full flex flex-col">
-					<div className="flex-1 bg-white">Top Row</div>
-					<div className="flex-1 bg-black">Bottom Row</div>
-				</div> */}
 				< Input
 					type="text"
 					className="pl-9 bg-white h-full"
@@ -48,28 +51,13 @@ function SearchBox({ search, setSearch, filteredMovies, onSelectMovie, disabled 
 				</PopoverTrigger>
 				< PopoverContent onOpenAutoFocus={(e) => e.preventDefault()
 				} className="w-[var(--radix-popover-trigger-width)]" >
-					{
-						filteredMovies.length > 0 ?
-							<div className="flex flex-col justify-center font-allerta ">
-								{
-									filteredMovies.map((movie) => (
-										<p className="w-full p-2 hover:bg-accent hover:cursor-pointer text-base md:text-sm"
-											key={movie.id}
-											onClick={async () => {
-												await onSelectMovie(movie);
-												setOpenSuggestions(false);
-												setSearch("");
-											}}
-										>
-											{movie.title}
-										</p>
-									))
-								}
-							</div>
-							:
-							search.trim() !== "" ? (
-								<p>No results found.</p>
-							) : null}
+
+					<MovieSuggestionList
+						movies={filteredMovies}
+						search={search}
+						onSelect={handleSelectMovie}
+					/>
+					
 				</PopoverContent>
 			</Popover>
 
