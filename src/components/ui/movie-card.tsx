@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { cn } from "@/lib/utils";
-import MovieCardBubble from "./movie-card-bubble";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { Movie } from "@/types";
+import MovieCardBubble from "./movie-card-bubble";
 
-function MovieCard({selectedMovie, movieOfTheDay}) {
+interface MovieCardProps {
+	selectedMovie: Movie;
+	movieOfTheDay: Movie | null;
+}
+
+function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 	const [isLoading, setIsLoading] = useState(true);
 
 	const getReleaseDateVariant = (selected, actual) => {
@@ -81,7 +87,7 @@ function MovieCard({selectedMovie, movieOfTheDay}) {
 	}
 
 	return (
-		<div key={movieObject.id} className="bg-white text-black w-full h-[150px] border-2 border-black rounded-xl p-2.5 flex gap-2.5">
+		<div className="bg-white text-black w-full h-[150px] border-2 border-black rounded-xl p-2.5 flex gap-2.5">
 			{/* movie poster */}
 			
 			<div className="brutalist-box h-full w-[101px] relative overflow-hidden">
