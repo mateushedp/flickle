@@ -1,5 +1,17 @@
-export function formatMovies(rawMovieArray) {
+import { Movie } from "@/types";
 
+interface RawMovie {
+	title: string;
+	poster_path: string;
+	genres: { id: number; name: string }[];
+	release_date: string;
+	origin_country: string[];
+	runtime: number;
+	vote_average: string;
+	budget: number;
+}
+
+export function formatMovies(rawMovieArray: RawMovie[]): Omit<Movie, "id" | "createdAt" | "updatedAt" | "dailyMovies">[] {
 	return rawMovieArray.map(rawMovie => ({
 		title: rawMovie.title,
 		poster_path: rawMovie.poster_path,
@@ -10,5 +22,4 @@ export function formatMovies(rawMovieArray) {
 		score: Math.round(parseFloat(rawMovie.vote_average) * 100) / 100,
 		budget: rawMovie.budget,
 	}));
-
 }
