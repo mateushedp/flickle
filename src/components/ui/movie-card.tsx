@@ -9,70 +9,80 @@ interface MovieCardProps {
 	movieOfTheDay: Movie | null;
 }
 
+interface MovieCardField {
+	value: string | number;
+	variant?: string;
+	direction?: "up" | "down";
+}
+
+interface VariantResult {
+	variant: string;
+	direction?: "up" | "down";
+}
+
+interface MovieCardObject {
+	title: string;
+	genre: MovieCardField;
+	release_year: MovieCardField;
+	country: MovieCardField;
+	runtime: MovieCardField;
+	score: MovieCardField;
+	budget: MovieCardField;
+}
+
+const getVariantByThreshold = (selected: number, actual: number, threshold: number): VariantResult => {
+	const direction = selected > actual ? "down" : "up";
+	if (selected === actual) return { variant: "success" };
+	if (Math.abs(selected - actual) < threshold) return { variant: "close", direction };
+	return { variant: "", direction };
+};
+
+const getVoteAvgVariant = (selected: number, actual: number): VariantResult => {
+	const direction = selected > actual ? "down" : "up";
+	if (selected === actual) return { variant: "success" };
+	if (Math.floor(selected) === Math.floor(actual)) return { variant: "close", direction };
+	return { variant: "", direction };
+};
+
+const getBudgetVariant = (selected: number, actual: number): VariantResult => {
+	const direction = selected > actual ? "down" : "up";
+	if (selected === actual) return { variant: "success" };
+	const percentageDiff = Math.abs(selected - actual) / ((selected + actual) / 2);
+	if (percentageDiff < 0.25) return { variant: "close", direction };
+	return { variant: "", direction };
+};
+
+
+const compareMovies = (selectedMovie: Movie, movieOfTheDay: Movie, movieObject: MovieCardObject ) => {
+
+	movieObject.country.variant = selectedMovie.country === movieOfTheDay.country ? "success" : "";
+	movieObject.genre.variant = selectedMovie.genre === movieOfTheDay.genre ? "success" : "";
+	movieObject.release_year = {
+		...movieObject.release_year,
+		...getVariantByThreshold(selectedMovie.release_year, movieOfTheDay.release_year, 10),
+	};
+
+	movieObject.budget = {
+		...movieObject.budget,
+		...getBudgetVariant(selectedMovie.budget, movieOfTheDay.budget),
+	};
+
+	movieObject.score = {
+		...movieObject.score,
+		...getVoteAvgVariant(selectedMovie.score, movieOfTheDay.score),
+	};
+
+	movieObject.runtime = {
+		...movieObject.runtime,
+		...getVariantByThreshold(selectedMovie.runtime, movieOfTheDay.runtime, 10),
+	};
+
+};
+
 function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 	const [isLoading, setIsLoading] = useState(true);
 
-	const getReleaseDateVariant = (selected, actual) => {
-		if (selected === actual) return { variant: "success" };
-		if (Math.abs(selected - actual) < 10)
-			return { variant: "close", direction: selected > actual ? "down" : "up" };
-		return { variant: "", direction: selected > actual ? "down" : "up" };
-	};
-
-	const getVoteAvgVariant = (selected, actual) => {
-		if (selected === actual) return { variant: "success" };
-		if (Math.floor(selected) === Math.floor(actual))
-			return { variant: "close", direction: selected > actual ? "down" : "up" };
-		return { variant: "", direction: selected > actual ? "down" : "up" };
-	};
-
-
-	const getRuntimeVariant = (selected, actual) => {
-		if (selected === actual) return { variant: "success" };
-		if (Math.abs(selected - actual) < 10)
-			return { variant: "close", direction: selected > actual ? "down" : "up" };
-		return { variant: "", direction: selected > actual ? "down" : "up" };
-	};
-
-	const getBudgetVariant = (selected, actual) => {
-		if (selected === actual) return { variant: "success" };
-		const diff = Math.abs(selected - actual);
-		const avg = (selected + actual) / 2;
-		const percentageDiff = diff / avg;
-
-		if (percentageDiff < 0.25)
-			return { variant: "close", direction: selected > actual ? "down" : "up" };
-		return { variant: "", direction: selected > actual ? "down" : "up" };
-	};
-
-
-	const compareMovies = (selectedMovie, movieOfTheDay, movieObject) => {
-
-		movieObject.country.variant = selectedMovie.country === movieOfTheDay.country ? "success" : "";
-		movieObject.genre.variant = selectedMovie.genre === movieOfTheDay.genre ? "success" : "";
-		movieObject.release_year = {
-			...movieObject.release_year,
-			...getReleaseDateVariant(selectedMovie.release_year, movieOfTheDay.release_year),
-		};
-
-		movieObject.budget = {
-			...movieObject.budget,
-			...getBudgetVariant(selectedMovie.budget, movieOfTheDay.budget),
-		};
-
-		movieObject.score = {
-			...movieObject.score,
-			...getVoteAvgVariant(selectedMovie.score, movieOfTheDay.score),
-		};
-
-		movieObject.runtime = {
-			...movieObject.runtime,
-			...getRuntimeVariant(selectedMovie.runtime, movieOfTheDay.runtime),
-		};
-
-	};
-
-	const movieObject = {
+	const movieObject: MovieCardObject = {
 		title: selectedMovie.title ?? " - ",
 		genre: {value: selectedMovie.genre ?? " - "},
 		release_year: {value: selectedMovie.release_year ?? " - "},
