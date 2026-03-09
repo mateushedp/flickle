@@ -1,27 +1,26 @@
 /* eslint-disable @next/next/no-img-element */
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { motion } from "framer-motion";
 
-function MovieCardBubble({ label, data }) {
-	const { value, variant, direction } = data || {};
-	const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-
-	const formatValue = (val) => {
-		if (Array.isArray(val)) {
-			if (val.length > 0 && typeof val[0] === "object" && "name" in val[0]) {
-				return val.map(item => item.name).join(", ");
-			}
-			return val.join(", ");
-		}
-
-		return val ?? "N/A";
+interface MovieCardBubbleProps {
+	label: string;
+	data: {
+		value: string | number;
+		variant?: string;
+		direction?: "up" | "down";
 	};
+}
+
+const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+
+function MovieCardBubble({ label, data }: MovieCardBubbleProps) {
+	const { value, variant, direction } = data;
 
 	const baseColor = variant === "success"
 		? "bg-green-main text-white"
@@ -35,7 +34,7 @@ function MovieCardBubble({ label, data }) {
 	return (
 		<motion.div
 			initial={{ boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }}
-			animate={{ boxShadow: "2px 2px rgba(0, 0, 0, 0.75)" }} // Match your shadow-sm
+			animate={{ boxShadow: "2px 2px rgba(0, 0, 0, 0.75)" }}
 			transition={{ duration: 0.8 }}
 			className={`h-full w-full rounded-sm ${baseColor} border border-black flex flex-col items-center px-1 text-center pt-[6px]`}
 		>
@@ -47,21 +46,21 @@ function MovieCardBubble({ label, data }) {
 							<TooltipTrigger>
 								<div className="flex flex-col items-center">
 									<img
-										alt="United States"
+										alt={regionNames.of(String(value)) ?? String(value)}
 										className="w-[40px] h-[20px]"
 										src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${value}.svg`}/>
 									<p className="text-[10px]">{value}</p>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>
-								<p>{value ? regionNames.of(value) : ""}</p>
+							<TooltipContent className="">
+								<p>{value ? regionNames.of(String(value)) : ""}</p>
 							</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 					
 				) : (
 					<>
-						<p className={`text-[15px] font-sans font-bold ${valueColor}`}>{formatValue(value)}</p>
+						<p className={`text-[15px] font-sans font-bold ${valueColor}`}>{value ?? "N/A"}</p>
 						{direction === "up" && <ChevronUp size={14} />}
 						{direction === "down" && <ChevronDown size={14} />}
 					</>
