@@ -101,7 +101,7 @@ function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 			{/* movie poster */}
 			
 			<div className="brutalist-box h-full w-[101px] relative overflow-hidden">
-				{selectedMovie && selectedMovie.poster_path &&
+				{selectedMovie.poster_path &&
 				<div className="relative w-full h-full">
 					{isLoading && 
 					<div className="absolute inset-0 bg-neutral-300 animate-shimmer " />}
@@ -128,13 +128,12 @@ function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 				<div className="flex gap-[5px] w-full h-1/2">
 					<MovieCardBubble label="Genre" data={movieObject.genre} />
 					<MovieCardBubble label="Runtime" data={movieObject.runtime} />
-
-	
 				</div>
+				
 				<div className="flex gap-[5px] w-full h-1/2">
-					<MovieCardBubble label={"Country"} data={movieObject.country}/>
-				 	<MovieCardBubble label={"Date"} data={movieObject.release_year}/>
-					<MovieCardBubble label={"Score"} data={movieObject.score}/>
+					<MovieCardBubble label="Country" data={movieObject.country}/>
+				 	<MovieCardBubble label="Date" data={movieObject.release_year}/>
+					<MovieCardBubble label="Score" data={movieObject.score}/>
 				</div>
 			</div>
 		</div>
