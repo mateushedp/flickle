@@ -33,7 +33,10 @@ const eslintConfig = [
 			semi: ["error"],
 			quotes: ["error", "double"],
 			"prefer-arrow-callback": ["error"],
-			"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+			"no-unused-vars": ["error", { 
+				argsIgnorePattern: "^_",
+				varsIgnorePattern: "^_"
+			}],
 			"no-undef": "error",
 			"import/order": ["error", {
 				"groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
