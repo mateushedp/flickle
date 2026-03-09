@@ -14,7 +14,7 @@ interface SearchBoxProps {
 	search: string;
 	setSearch: (_value: string) => void;
 	filteredMovies: Movie[];
-	onSelectMovie: (_movie: Movie) => Promise<void>;
+	onSelectMovie: (_movie: Movie) => void;
 	disabled?: boolean;
 }
 
@@ -26,8 +26,8 @@ function SearchBox({ search, setSearch, filteredMovies, onSelectMovie, disabled 
 		setOpenSuggestions(e.target.value.trim() !== "");
 	};
 
-	const handleSelectMovie = async (movie: Movie) => {
-		await onSelectMovie(movie);
+	const handleSelectMovie = (movie: Movie) => {
+		onSelectMovie(movie);
 		setOpenSuggestions(false);
 		setSearch("");
 	};

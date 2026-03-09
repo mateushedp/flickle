@@ -3,7 +3,7 @@ import { Movie } from "@/types";
 interface MovieSuggestionListProps {
     movies: Movie[];
     search: string;
-    onSelect: (_movie: Movie) => Promise<void>;
+    onSelect: (_movie: Movie) => void;
 }
 
 function MovieSuggestionList({ movies, search, onSelect }: MovieSuggestionListProps) {
