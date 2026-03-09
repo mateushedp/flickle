@@ -1,24 +1,23 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
+import { isSameDay, parseISO, format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
 import {
 	Dialog,
 	DialogContent,
 } from "@/components/ui/dialog";
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
-import { isSameDay, parseISO, format } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/ui/confetti";
-import Image from "next/image";
 import prisma from "@/lib/prisma";
 import Poster from "@/components/ui/poster";
+import { Movie } from "@/types";
+import type { GetServerSideProps } from "next";
 
-
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
 	const movies = await prisma.movie.findMany();
 
 	const cleanedMovies = movies.map(movie => {
-		const { createdAt, updatedAt, ...cleanedMovie } = movie;
+		const { createdAt: _createdAt, updatedAt: _updatedAt, ...cleanedMovie } = movie;
 		return cleanedMovie;
 	});
 
@@ -44,9 +43,14 @@ export async function getServerSideProps() {
 	};
 }
 
-function Home({movies, movieOfTheDay}) {
+interface HomeProps {
+	movies: Movie[];
+	movieOfTheDay: Movie | null;
+}
 
-	const [selectedMovies, setSelectedMovies] = useState([]);
+function Home({ movies, movieOfTheDay }: HomeProps) {
+
+	const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
 	const [tries, setTries] = useState(0);
 
 	const [search, setSearch] = useState("");
@@ -58,28 +62,28 @@ function Home({movies, movieOfTheDay}) {
 	
 	const maxTries = 10;
 
-	const checkGameStatus = (movies, tries) => {
-		const hasWon = movies ? movies.some((movie) => movie.title === movieOfTheDay.title) : false;
-		const hasLost = tries >= maxTries && !hasWon;
+	const checkGameStatus = (updatedMovies: Movie[], updatedTries: number) => {
+		const won = updatedMovies ? updatedMovies.some((movie) => movie.title === movieOfTheDay?.title) : false;
+		const lost = updatedTries >= maxTries && !won;
 
-		if (hasWon) {
+		if (won) {
 			setHasWon(true);
 			setShowSuccessModal(true);
-		} else if (hasLost) {
+		} else if (lost) {
 			setHasLost(true);
 			setShowFailModal(true);
 		}
 	};
 
-	const saveGame = (movies, tries) => {
+	const saveGame = (movies: Movie[], tries: number) => {
 		const today = format(new Date(), "yyyy-MM-dd");
 		localStorage.setItem("savedMovies", JSON.stringify(movies));
 		localStorage.setItem("savedTries", JSON.stringify(tries));
 		localStorage.setItem("savedDate", today);
 	};
 
-	const onSelectMovie = (movie) => {
-		if (hasWon || hasLost || selectedMovies.find((m) => m.title === movie.title)) return;
+	const onSelectMovie = (movie: Movie) => {
+		if (hasWon || hasLost || selectedMovies.some((m) => m.title === movie.title)) return;
 
 		const updatedMovies = [movie, ...selectedMovies];
 		const updatedTries = tries + 1;
@@ -87,7 +91,6 @@ function Home({movies, movieOfTheDay}) {
 		setSelectedMovies(updatedMovies);
 		setTries(updatedTries);
 		saveGame(updatedMovies, updatedTries);
-
 		checkGameStatus(updatedMovies, updatedTries);
 	};
 
@@ -95,8 +98,8 @@ function Home({movies, movieOfTheDay}) {
 		const savedDateStr = localStorage.getItem("savedDate");
 		const today = new Date();
 
-		const savedMovies = JSON.parse(localStorage.getItem("savedMovies"));
-		const savedTries = JSON.parse(localStorage.getItem("savedTries"));
+		const savedMovies = JSON.parse(localStorage.getItem("savedMovies") ?? "[]") as Movie[];
+		const savedTries = JSON.parse(localStorage.getItem("savedTries") ?? "0") as number;
 
 		const isValid = savedDateStr && isSameDay(parseISO(savedDateStr), today);
 
@@ -204,7 +207,7 @@ function Home({movies, movieOfTheDay}) {
 					} */}
 					<p className="font-bold text-black text-[18px] text-end my-[16px]">Guesses: {tries}/{maxTries}</p>
 					<div className="flex flex-col gap-4">
-						{hasLost && 
+						{hasLost && movieOfTheDay &&
 						<MovieCard key={movieOfTheDay.id} selectedMovie={movieOfTheDay} movieOfTheDay={movieOfTheDay}/>
 						}
 						<AnimatePresence initial={false}>
