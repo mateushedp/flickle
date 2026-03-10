@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const secret = process.env.CRON_SECRET;
 	const token = req.query.secret;
 
