@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { isSameDay, parseISO, format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import type { GetServerSideProps } from "next";
 import {
 	Dialog,
 	DialogContent,
@@ -8,10 +9,9 @@ import {
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
 import Confetti from "@/components/ui/confetti";
-import prisma from "@/lib/prisma";
 import Poster from "@/components/ui/poster";
 import { Movie } from "@/types";
-import type { GetServerSideProps } from "next";
+import prisma from "@/lib/prisma";
 
 export const getServerSideProps: GetServerSideProps = async () => {
 	const movies = await prisma.movie.findMany();
@@ -28,20 +28,17 @@ export const getServerSideProps: GetServerSideProps = async () => {
 		},
 	});
 
-	// Clean up Date fields in dailyMovie
-	if (dailyMovie) {
-		delete dailyMovie.movie.createdAt;
-		delete dailyMovie.movie.updatedAt;
-		delete dailyMovie.date;
-	}
+	const movieOfTheDay = dailyMovie?.movie
+		? (({ createdAt: _createdAt, updatedAt: _updatedAt, ...rest }) => rest)(dailyMovie.movie)
+		: null;
 
 	return {
 		props: {
 			movies: cleanedMovies,
-			movieOfTheDay: dailyMovie?.movie || null,
+			movieOfTheDay,
 		},
 	};
-}
+};
 
 interface HomeProps {
 	movies: Movie[];
