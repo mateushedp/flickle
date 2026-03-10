@@ -1,15 +1,5 @@
-import { Movie } from "@/types";
+import { Movie, RawMovie } from "@/types";
 
-interface RawMovie {
-	title: string;
-	poster_path: string;
-	genres: { id: number; name: string }[];
-	release_date: string;
-	origin_country: string[];
-	runtime: number;
-	vote_average: string;
-	budget: number;
-}
 
 export function formatMovies(rawMovieArray: RawMovie[]): Omit<Movie, "id" | "createdAt" | "updatedAt" | "dailyMovies">[] {
 	return rawMovieArray.map(rawMovie => ({
@@ -17,7 +7,7 @@ export function formatMovies(rawMovieArray: RawMovie[]): Omit<Movie, "id" | "cre
 		poster_path: rawMovie.poster_path,
 		genre: rawMovie.genres[0].name,
 		release_year: parseInt(rawMovie.release_date.substring(0, 4)),
-		country: rawMovie.origin_country.length ? rawMovie.origin_country[0] : null,
+		country: rawMovie.origin_country[0] ?? "",
 		runtime: rawMovie.runtime,
 		score: Math.round(parseFloat(rawMovie.vote_average) * 100) / 100,
 		budget: rawMovie.budget,
