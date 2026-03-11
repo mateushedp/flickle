@@ -1,8 +1,6 @@
-import { useState } from "react";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
 import { Movie } from "@/types";
 import MovieCardBubble from "./movie-card-bubble";
+import Poster from "./poster";
 
 interface MovieCardProps {
 	selectedMovie: Movie;
@@ -80,7 +78,6 @@ const compareMovies = (selectedMovie: Movie, movieOfTheDay: Movie, movieObject: 
 };
 
 function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
-	const [isLoading, setIsLoading] = useState(true);
 
 	const movieObject: MovieCardObject = {
 		title: selectedMovie.title,
@@ -98,30 +95,9 @@ function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 
 	return (
 		<div className="bg-white text-black w-full h-[150px] border-2 border-black rounded-xl p-2.5 flex gap-2.5">
-			{/* movie poster */}
 			
 			<div className="brutalist-box h-full w-[101px] relative overflow-hidden">
-				{selectedMovie.poster_path &&
-				<div className="relative w-full h-full">
-					{isLoading && 
-					<div className="absolute inset-0 bg-neutral-300 animate-shimmer " />}
-
-					<Image 
-						src={`https://image.tmdb.org/t/p/w780${selectedMovie.poster_path}`} 
-						alt={selectedMovie.title || "Movie poster"}
-						fill
-						className={cn(
-							"background-cover object-cover transition-opacity duration-500",
-							isLoading ? "opacity-0" : "opacity-100"
-						)}
-						onLoadingComplete={() => setIsLoading(false)}
-					/>
-				</div>
-				 
-				}
-				<div className="w-full min-h-[30px] max-h-[60px] absolute bottom-0 border bg-white flex items-center justify-center">
-					<p className="font-bold text-[12px] text-center line-clamp-3">{selectedMovie.title}</p>
-				</div>
+				<Poster movie={selectedMovie} showTitle />
 			</div>
 
 			<div className="h-full w-[218px] flex flex-col gap-[5px]">
