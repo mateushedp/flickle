@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import { isSameDay, parseISO, format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GetServerSideProps } from "next";
-import {
-	Dialog,
-	DialogContent,
-} from "@/components/ui/dialog";
 import MovieCard from "@/components/ui/movie-card";
 import SearchBox from "@/components/ui/search-box";
 import Confetti from "@/components/ui/confetti";
-import Poster from "@/components/ui/poster";
 import { Movie } from "@/types";
 import prisma from "@/lib/prisma";
+import GameResultModal from "@/components/ui/game-result-modal";
 
 export const getServerSideProps: GetServerSideProps = async () => {
 	const movies = await prisma.movie.findMany();
@@ -129,47 +125,24 @@ function Home({ movies, movieOfTheDay }: HomeProps) {
 
 	return (
 		<div className="max-w-full min-h-screen bg-white flex flex-col items-center">
-			<Dialog open={showFailModal} onOpenChange={setShowFailModal} >
-				<DialogContent className="w-[340px]">
-					<div>
-						<p className="mb-8">Out of guesses...</p>
-						<p>Today&apos;s movie is</p>
-						{movieOfTheDay  &&
-									<>
-										<div className="brutalist-box mx-auto my-3.5 truncate max-w-[180px] h-[234px] relative overflow-hidden">
-											<Poster movie={movieOfTheDay}/>
-										</div>
-										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
-											{movieOfTheDay.title} ({movieOfTheDay.release_year})
-										</p>
-									</>
-						}
-					</div>
-				</DialogContent>
-			</Dialog>
 			
 			{showSuccessModal &&
 				<Confetti />
 			}
 			
-			<Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal} >
-				<DialogContent className="w-[340px] text-white bg-green-main">
-					<div>
-						<p className="mb-8">You got it!!!</p>
-						<p>Today&apos;s movie is</p>
-						{movieOfTheDay  &&
-									<>
-										<div className="brutalist-box mx-auto my-3.5 truncate max-w-[180px] h-[234px] relative overflow-hidden">
-											<Poster movie={movieOfTheDay} />
-										</div>
-										<p className="text-2xl font-bold break-words text-center max-w-xs mx-auto">
-											{movieOfTheDay.title} ({movieOfTheDay.release_year})
-										</p>
-									</>
-						}
-					</div>
-				</DialogContent>
-			</Dialog>
+			<GameResultModal
+				open={showFailModal}
+				onOpenChange={setShowFailModal}
+				type="failure"
+				movie={movieOfTheDay}
+			/>
+
+			<GameResultModal
+				open={showSuccessModal}
+				onOpenChange={setShowSuccessModal}
+				type="success"
+				movie={movieOfTheDay}
+			/>
 
 			{/* main container */}
 			<div className="w-[384px] px-[22px] h-full flex flex-col items-center">
