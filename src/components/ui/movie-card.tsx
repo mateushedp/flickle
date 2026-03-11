@@ -83,13 +83,13 @@ function MovieCard({selectedMovie, movieOfTheDay}: MovieCardProps) {
 	const [isLoading, setIsLoading] = useState(true);
 
 	const movieObject: MovieCardObject = {
-		title: selectedMovie.title ?? " - ",
-		genre: {value: selectedMovie.genre ?? " - "},
-		release_year: {value: selectedMovie.release_year ?? " - "},
-		country: {value: selectedMovie.country ?? " - "},
-		runtime: {value: selectedMovie.runtime + " min"},
-		score: {value: selectedMovie.score},
-		budget: {value: "$" + selectedMovie.budget.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2})}
+		title: selectedMovie.title,
+		genre: { value: selectedMovie.genre },
+		release_year: { value: selectedMovie.release_year },
+		country: { value: selectedMovie.country },
+		runtime: { value: selectedMovie.runtime + " min" },
+		score: { value: selectedMovie.score },
+		budget: { value: "$" + selectedMovie.budget.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
 	};
 
 	if(movieOfTheDay){
