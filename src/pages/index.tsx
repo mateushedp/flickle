@@ -54,7 +54,7 @@ function Home({ movies, movieOfTheDay }: HomeProps) {
 		setShowFailModal,
 		onSelectMovie,
 	} = useGameState(movieOfTheDay);
-	
+
 	const [search, setSearch] = useState("");
 	
 	const maxTries = 10;
@@ -92,7 +92,7 @@ function Home({ movies, movieOfTheDay }: HomeProps) {
 			{/* main container */}
 			<div className="w-[384px] px-[22px] h-full flex flex-col items-center">
 				{/* header */}
-				<div className="absolute w-dvw h-[255px] bg-black pt-3">
+				<div className="absolute w-full h-[255px] bg-black pt-3">
 					
 
 				</div>
