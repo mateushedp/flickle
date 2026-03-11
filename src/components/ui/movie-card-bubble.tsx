@@ -60,7 +60,7 @@ function MovieCardBubble({ label, data }: MovieCardBubbleProps) {
 					
 				) : (
 					<>
-						<p className={`text-[15px] font-sans font-bold ${valueColor}`}>{value ?? "N/A"}</p>
+						<p className={`text-[15px] font-sans font-bold ${valueColor}`}>{value}</p>
 						{direction === "up" && <ChevronUp size={14} />}
 						{direction === "down" && <ChevronDown size={14} />}
 					</>
