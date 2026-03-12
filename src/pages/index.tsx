@@ -97,7 +97,7 @@ function Home({ movies, movieOfTheDay }: HomeProps) {
 
 				</div>
 				<div className="relative top-0 w-full">
-					<h1 className="font-pacifico text-[64px] text-white text-center">Flickle</h1>
+					<h1 className="font-pacifico text-[64px] text-white text-center">Reelie</h1>
 					<div className="font-antonio text-[18px] text-white text-center my-5">
 						<p>Guess the movie of the day!</p>
 						<p><span className="text-yellow-main">Yellow</span> means you&apos;re close,</p>
